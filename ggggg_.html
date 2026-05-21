@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartAttendance Ultimate v4.0 - Расписание & Модерация Жүйесі</title>
+    <style>
+        /* ==========================================================================
+           1. ДИЗАЙН СИСТЕМАСЫ ЖӘНЕ ОРТАҚ СТИЛЬДЕР (CSS GLOBAL)
+           ========================================================================== */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --success: #16a34a;
+            --success-dark: #15803d;
+            --success-light: #dcfce7;
+            --danger: #dc2626;
+            --danger-dark: #b91c1c;
+            --danger-light: #fee2e2;
+            --warning: #ca8a04;
+            --warning-dark: #a16207;
+            --warning-light: #fef9c3;
+            --dark-main: #0f172a;
+            --dark-light: #334155;
+            --gray-bg: #f8fafc;
+            --gray-border: #cbd5e1;
+            --gray-text: #94a3b8;
+            --white: #ffffff;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray-bg);
+            color: var(--dark-main);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .app-layout {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wrapper {
+            flex: 1 0 auto;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ==========================================================================
+           2. НАВИГАЦИЯ ЖӘНЕ ЖОҒАРҒЫ ПАНЕЛЬ (HEADER CSS)
+           ========================================================================== */
+        header {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--gray-border);
+            padding: 20px 0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+
+        .nav-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-version {
+            font-size: 11px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .nav-profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-meta {
+            text-align: right;
+        }
+
+        .user-fullname {
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--dark-main);
+        }
+
+        .user-tag {
+            font-size: 12px;
+            color: var(--dark-light);
+            font-weight: 500;
+        }
+
+        .avatar-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            border: 3px solid var(--primary-light);
+        }
+
+        /* ==========================================================================
+           3. ФОРМАЛАР МЕН ЕНГІЗУ ӨРІСТЕРІ (FORMS & INPUTS CSS)
+           ========================================================================== */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark-light);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--gray-border);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            transition: var(--transition);
+            outline: none;
+            background-color: #f8fafc;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Түймешіктер */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-block { width: 100%; }
+        .btn-primary { background-color: var(--primary); color: var(--white); }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-success { background-color: var(--success); color: var(--white); }
+        .btn-success:hover { background-color: var(--success-dark); }
+        .btn-danger { background-color: var(--danger); color: var(--white); }
+        .btn-danger:hover { background-color: var(--danger-dark); }
+        .btn-secondary { background-color: var(--white); border-color: var(--gray-border); color: var(--dark-light); }
+        .btn-secondary:hover { background-color: var(--gray-bg); }
+        .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
+
+        /* ==========================================================================
+           4. САБЫҚ КЕСТЕСІНІҢ ДИЗАЙНЫ (SCHEDULE TABLE CSS)
+           ========================================================================== */
+        .schedule-box {
+            background: var(--white);
+            border: 1px solid var(--gray-border);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            margin-top: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .schedule-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--dark-main);
+        }
+
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .schedule-item {
+            background: var(--gray-bg);
+            border: 1px solid var(--gray-border);
+            border-left: 4px solid var(--primary);
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .schedule-time {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .schedule-subject {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 4px 0;
+        }
+
+        .schedule-room {
+            font-size: 11px;
+            color: var(--gray-text);
+        }
+
+        /* ==========================================================================
+           5. АВТОРИЗАЦИЯ ЖӘНЕ ТИРКЕЛУ (AUTH SCREENS CSS)
+           ========================================================================== */
+        .auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 75vh;
+        }
+
+        .auth-card-box {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-border);
+            width: 100%;
+            max-width: 460px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .auth-card-box h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: var(--dark-main);
+        }
+
+        .auth-card-box p {
+            color: var(--gray-text);
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        .auth-toggle-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-toggle-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Модульдік беттер ауысуы */
+        .view-module {
+            display: none;
+            animation: appSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .view-module.view-active {
+            display: block;
+        }
+
+        @keyframes appSlideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==========================================================================
+           6. СТУДЕНТ КҮНДЕЛІГІ (STUDENT INTERFACE CSS)
+           ========================================================================== */
+        .student-centered-layout {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .dashboard-card {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-border);
+            box-shadow: var(--shadow);
+            padding: 35px;
+            margin-bottom: 20px;
+        }
+
+        .status-alert-box {
+            border-radius: var(--radius-md);
+            padding: 24px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 18px;
+            margin: 25px 0;
+        }
+
+        .status-unmarked { background-color: var(--warning-light); color: var(--warning-dark); border: 1px solid #fef08a; }
+        .status-confirmed { background-color: var(--success-light); color: var(--success-dark); border: 1px solid #bbf7d0; }
+        .status-declined { background-color: var(--danger-light); color: var(--danger-dark); border: 1px solid #fecaca; }
+
+        /* ==========================================================================
+           7. КУРАТОРДЫҢ ЖЕКЕ ПАНЕЛІ (CURATOR DASHBOARD CSS)
+           ========================================================================== */
+        .analytics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 35px;
+        }
+
+        .analytics-card {
+            background-color: var(--white);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--gray-border);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);
+        }
+
+        .analytics-data h4 {
+            font-size: 13px;
+            text-transform: uppercase;
+            color: var(--gray-text);
+            letter-spacing: 0.5px;
+        }
+
+        .analytics-data .num-display {
+            font-size: 32px;
+            font-weight: 900;
+            margin-top: 4px;
+            color: var(--dark-main);
+        }
+
+        .analytics-icon-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .bg-blue-soft { background-color: var(--primary-light); color: var(--primary); }
+        .bg-green-soft { background-color: var(--success-light); color: var(--success); }
+        .bg-red-soft { background-color: var(--danger-light); color: var(--danger); }
+
+        .table-controls {
+            background-color: var(--white);
+            border: 1px solid var(--gray-border);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .table-responsive-box {
+            background-color: var(--white);
+            border: 1px solid var(--gray-border);
+            border-top: none;
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            overflow-x: auto;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        .custom-table th {
+            background-color: #f1f5f9;
+            color: var(--dark-light);
+            padding: 18px 24px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--gray-border);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-table td {
+            padding: 15px 24px;
+            border-bottom: 1px solid var(--gray-border);
+            vertical-align: middle;
+        }
+
+        .custom-table tr:hover { background-color: #f8fafc; }
+
+        .status-pill {
+            display: inline-flex;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 20px;
+        }
+
+        .pill-present { background-color: var(--success-light); color: var(--success-dark); }
+        .pill-absent { background-color: var(--danger-light); color: var(--danger-dark); }
+        .pill-none { background-color: var(--warning-light); color: var(--warning-dark); }
+
+        footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--gray-border);
+            padding: 25px 0;
+            text-align: center;
+            font-size: 13px;
+            color: var(--dark-light);
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- ЖҮЙЕЛІК ЖОҒАРҒЫ ШАПКА -->
+        <header id="globalHeader" style="display: none;">
+            <div class="nav-inner">
+                <a href="#" class="logo-text" onclick="navigateToCorrectView(); return false;">
+                    SmartAttendance <span class="logo-version">v4.0 Pro</span>
+                </a>
+                <div class="nav-profile">
+                    <div class="user-meta">
+                        <div class="user-fullname" id="lblNavName">Жүктелуде...</div>
+                        <div class="user-tag" id="lblNavRole">Анықталуда...</div>
+                    </div>
+                    <div class="avatar-circle" id="lblNavAvatar">U</div>
+                    <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 13px;" onclick="executeUserLogout()">Жүйеден шығу</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- НЕГІЗГІ СЕРВЕРСІЗ БЕТТЕР КОНТЕНТІ -->
+        <main class="wrapper">
+
+            <!-- БЕТ 1: ЖҮЙЕГЕ КІРУ (SIGN IN) -->
+            <div id="viewSignIn" class="view-module view-active">
+                <div class="auth-container">
+                    <div class="auth-card-box">
+                        <h2>Жүйеге кіру</h2>
+                        <p>Жеке логин мен пароліңізді енгізіңіз</p>
+
+                        <form id="formSignIn" onsubmit="handleUserSignIn(event)">
+                            <div class="form-group">
+                                <label class="form-label" for="txtSignInEmail">Электронды пошта (Логин):</label>
+                                <input type="email" id="txtSignInEmail" class="form-control" placeholder="myself@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="txtSignInPassword">Құпия сөз (Пароль):</label>
+                                <input type="password" id="txtSignInPassword" class="form-control" placeholder="••••••••" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Кабинетке кіру</button>
+                        </form>
+
+                        <div style="margin-top: 25px; font-size: 14px; color: var(--dark-light);">
+                            Аккаунтыңыз жоқ па? <span class="auth-toggle-link" onclick="switchAuthView('viewSignUp')">Қазір тіркеліңіз</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- БЕТ 2: ЖҮЙЕГЕ ТІРКЕЛУ (SIGN UP) -->
+            <div id="viewSignUp" class="view-module">
+                <div class="auth-container">
+                    <div class="auth-card-box">
+                        <h2>Жаңа аккаунт ашу</h2>
+                        <p>Платформаға тіркелу үшін форманы толтырыңыз</p>
+
+                        <form id="formSignUp" onsubmit="handleUserSignUp(event)">
+                            <div class="form-group">
+                                <label class="form-label" for="txtSignUpName">Толық аты-жөніңіз:</label>
+                                <input type="text" id="txtSignUpName" class="form-control" placeholder="Асқар Сұлтанов" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="txtSignUpEmail">Электронды поштаңыз (Логин):</label>
+                                <input type="email" id="txtSignUpEmail" class="form-control" placeholder="user@domain.kz" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="txtSignUpPassword">Құпия сөз орнатыңыз:</label>
+                                <input type="password" id="txtSignUpPassword" class="form-control" placeholder="Кемі 6 таңба" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="selectSignUpRole">Жүйедегі рөліңіз:</label>
+                                <select id="selectSignUpRole" class="form-control" onchange="toggleGroupInputVisibility(this.value)">
+                                    <option value="student">Студент (Өз сабағын белгілеуші)</option>
+                                    <option value="curator">Куратор (Журнал бақылаушысы)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="groupFieldWrapper">
+                                <label class="form-label" for="txtSignUpGroup">Академиялық топ атауы:</label>
+                                <input type="text" id="txtSignUpGroup" class="form-control" placeholder="АКТ-21, ИС-22 т.б.">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Тіркелуді аяқтау</button>
+                        </form>
+
+                        <div style="margin-top: 25px; font-size: 14px; color: var(--dark-light);">
+                            Тіркелгенсіз бе? <span class="auth-toggle-link" onclick="switchAuthView('viewSignIn')">Кіру бетіне өту</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- БЕТ 3: СТУДЕНТТІҢ ЖЕКЕ КАБИНЕТІ -->
+            <div id="viewStudentDashboard" class="view-module">
+                <div class="student-centered-layout">
+                    <div class="dashboard-card">
+                        <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">Студенттік бақылау панелі</h2>
+                        <div id="lblStudentGroupDisplay" style="font-size: 14px; color: var(--gray-text); margin-bottom: 20px;">Тобы: Белгісіз</div>
+
+                        <p style="font-size: 14px; color: var(--dark-light); margin-bottom: 15px;">
+                            Жүйе сіздің жеке профиліңізді растады. Бүгінгі қатысу мәртебеңізді таңдаңыз (Мәлімет тұрақты сақталады):
+                        </p>
+
+                        <div id="divStudentStatusAlert" class="status-alert-box status-unmarked">
+                            Сіз бүгін әлі қатысуыңызды растамадыңыз!
+                        </div>
+
+                        <div style="display: flex; gap: 16px;">
+                            <button class="btn btn-success" style="flex: 1; padding: 14px;" onclick="sendAttendanceMark(true)">👍 Мен Сабақтамын</button>
+                            <button class="btn btn-danger" style="flex: 1; padding: 14px;" onclick="sendAttendanceMark(false)">👎 Мен Сабақта Жоқпын</button>
+                        </div>
+                    </div>
+
+                    <!-- САБАҚ КЕСТЕСІ (СТУДЕНТ) -->
+                    <div class="schedule-box">
+                        <div class="schedule-title">📅 Бүгінгі сабақ кестесі (Расписание)</div>
+                        <div class="schedule-grid" id="studentScheduleGrid">
+                            <!-- JS арқылы толығады -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- БЕТ 4: КУРАТОРДЫҢ ЖЕКЕ ЖУРНАЛ БЕТІ (МОДЕРАЦИЯМЕН) -->
+            <div id="viewCuratorDashboard" class="view-module">
+                <h2 style="font-size: 26px; font-weight: 800; margin-bottom: 6px;">Куратордың Жеке Журналы</h2>
+                <p style="color: var(--dark-light); margin-bottom: 30px;">Студенттерді бақылау, расписание көру және қате никтерді өшіру панелі.</p>
+
+                <!-- Статистика -->
+                <div class="analytics-row">
+                    <div class="analytics-card">
+                        <div class="analytics-data">
+                            <h4>Тіркелген Жалпы Студенттер</h4>
+                            <div class="num-display" id="numTotalStudents">0</div>
+                        </div>
+                        <div class="analytics-icon-badge bg-blue-soft">👥</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-data">
+                            <h4>Бүгін Сабақта Бар</h4>
+                            <div class="num-display" id="numPresentStudents" style="color: var(--success);">0</div>
+                        </div>
+                        <div class="analytics-icon-badge bg-green-soft">✅</div>
+                    </div>
+                    <div class="analytics-card">
+                        <div class="analytics-data">
+                            <h4>Бүгін Сабақта Жоқ / Белгілемеген</h4>
+                            <div class="num-display" id="numAbsentStudents" style="color: var(--danger);">0</div>
+                        </div>
+                        <div class="analytics-icon-badge bg-red-soft">❌</div>
+                    </div>
+                </div>
+
+                <!-- Басқару элементтері -->
+                <div class="table-controls">
+                    <div style="flex: 1; max-width: 380px;">
+                        <input type="text" id="txtSearchTable" class="form-control" placeholder="Студент атымен немесе никпен іздеу..." oninput="triggerTableSearch()">
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-danger" onclick="wipeOutAttendanceDatabase()">🧹 Тек Мәртебелерді Тазалау</button>
+                    </div>
+                </div>
+
+                <!-- Студенттер кестесі -->
+                <div class="table-responsive-box">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Аты-жөні (Ник)</th>
+                                <th>Логин (Email)</th>
+                                <th>Академиялық Топ</th>
+                                <th>Қатысу Статусы</th>
+                                <th>Белгіленген Уақыты</th>
+                                <th style="text-align: center;">Басқару (Модерация)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBodyCuratorRecords">
+                            <!-- Деректер осында құрылады -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- САБАҚ КЕСТЕСІ (КУРАТОР) -->
+                <div class="schedule-box">
+                    <div class="schedule-title">📅 Оқу орнының бекітілген сабақ кестесі</div>
+                    <div class="schedule-grid" id="curatorScheduleGrid">
+                        <!-- JS арқылы толығады -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- БЕТ 5: ҚАУІПСІЗДІК ПАНЕЛІ -->
+            <div id="viewAccessDenied" class="view-module">
+                <div style="text-align: center; padding: 60px 20px; max-width: 500px; margin: 0 auto; background: white; border-radius: var(--radius-lg); border:1px solid var(--gray-border);">
+                    <div style="font-size: 64px; margin-bottom: 20px;">🛑</div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 12px;">Рұқсат берілмеді!</h3>
+                    <p style="color: var(--dark-light); margin-bottom: 25px;">Қате рөлдік рұқсат.</p>
+                    <button class="btn btn-primary" onclick="navigateToCorrectView()">Артқа қайту</button>
+                </div>
+            </div>
+
+        </main>
+
+        <footer>
+            <p>&copy; 2026 SmartAttendance System Ultimate v4.0. Локальді мәліметтер қорымен қорғалған.</p>
+        </footer>
+
+    </div>
+
+    <!-- ==========================================================================
+       8. ЖҮЙЕЛІК БАСҚАРУ СКРИПТІ (JAVASCRIPT ENGINE)
+       ========================================================================== */ -->
+    <script>
+        let currentActiveUserSession = null;
+
+        // Сабақ кестесінің тұрақты деректері (База)
+        const ACADEMIC_SCHEDULE = [
+            { time: "09:00 - 10:20", subject: "Жоғары Математика", room: "302 Аудитория" },
+            { time: "10:30 - 11:50", subject: "Веб-программалау (JS)", room: "415 Компьютерлік класс" },
+            { time: "12:10 - 13:30", subject: "Деректер Қоры (SQL)", room: "204 Аудитория" },
+            { time: "13:40 - 15:00", subject: "Желілік технологиялар", room: "108 Лаборатория" }
+        ];
+
+        // Бастапқы тесттік қолданушылар
+        const PRECONFIGURED_USERS = [
+            { fullname: "Маржан Болатқызы (Куратор)", email: "kurator@mail.ru", password: "123", role: "curator", group: "" },
+            { fullname: "Асан Әлиев", email: "asan@mail.ru", password: "123", role: "student", group: "АКТ-21" },
+            { fullname: "Сәбина Серікова", email: "sabina@mail.ru", password: "123", role: "student", group: "АКТ-21" }
+        ];
+
+        window.addEventListener('load', () => {
+            initializeDatabaseSetup();
+            checkExistingUserSession();
+            renderAcademicSchedule();
+        });
+
+        function initializeDatabaseSetup() {
+            if (!localStorage.getItem('auth_users_directory')) {
+                localStorage.setItem('auth_users_directory', JSON.stringify(PRECONFIGURED_USERS));
+            }
+            if (!localStorage.getItem('attendance_marks_matrix')) {
+                localStorage.setItem('attendance_marks_matrix', JSON.stringify({}));
+            }
+        }
+
+        function checkExistingUserSession() {
+            const activeSessionToken = localStorage.getItem('active_login_token');
+            if (activeSessionToken) {
+                currentActiveUserSession = JSON.parse(activeSessionToken);
+                displayAppHeaderStructure();
+                navigateToCorrectView();
+            } else {
+                switchAuthView('viewSignIn');
+                document.getElementById('globalHeader').style.display = 'none';
+            }
+        }
+
+        /* НАВИГАЦИЯ */
+        function switchAuthView(viewElementId) {
+            const modules = document.querySelectorAll('.view-module');
+            modules.forEach(mod => mod.classList.remove('view-active'));
+            
+            const targetModule = document.getElementById(viewElementId);
+            if (targetModule) targetModule.classList.add('view-active');
+        }
+
+        function toggleGroupInputVisibility(roleValue) {
+            document.getElementById('groupFieldWrapper').style.display = (roleValue === 'curator') ? 'none' : 'block';
+        }
+
+        function displayAppHeaderStructure() {
+            document.getElementById('globalHeader').style.display = 'block';
+            document.getElementById('lblNavName').innerText = currentActiveUserSession.fullname;
+            document.getElementById('lblNavRole').innerText = currentActiveUserSession.role === 'curator' ? 'Жүйелік Куратор' : `Студент (${currentActiveUserSession.group})`;
+            document.getElementById('lblNavAvatar').innerText = currentActiveUserSession.fullname.charAt(0);
+        }
+
+        function navigateToCorrectView() {
+            if (!currentActiveUserSession) {
+                switchAuthView('viewSignIn');
+                return;
+            }
+            if (currentActiveUserSession.role === 'curator') {
+                switchAuthView('viewCuratorDashboard');
+                buildCuratorRecordsTable();
+            } else {
+                switchAuthView('viewStudentDashboard');
+                renderStudentAttendanceState();
+            }
+        }
+
+        /* САБЫҚ КЕСТЕСІН ШЫҒАРУ */
+        function renderAcademicSchedule() {
+            const studentGrid = document.getElementById('studentScheduleGrid');
+            const curatorGrid = document.getElementById('curatorScheduleGrid');
+            
+            let scheduleHtml = '';
+            ACADEMIC_SCHEDULE.forEach(item => {
+                scheduleHtml += `
+                    <div class="schedule-item">
+                        <div class="schedule-time">⏱️ ${item.time}</div>
+                        <div class="schedule-subject">${item.subject}</div>
+                        <div class="schedule-room">📍 ${item.room}</div>
+                    </div>
+                `;
+            });
+            
+            if(studentGrid) studentGrid.innerHTML = scheduleHtml;
+            if(curatorGrid) curatorGrid.innerHTML = scheduleHtml;
+        }
+
+        /* ТІРКЕЛУ ЖӘНЕ КІРУ */
+        function handleUserSignUp(event) {
+            event.preventDefault();
+            const fullName = document.getElementById('txtSignUpName').value.trim();
+            const email = document.getElementById('txtSignUpEmail').value.trim().toLowerCase();
+            const password = document.getElementById('txtSignUpPassword').value;
+            const role = document.getElementById('selectSignUpRole').value;
+            let group = document.getElementById('txtSignUpGroup').value.trim().toUpperCase();
+
+            if (role === 'curator') group = "";
+
+            const usersList = JSON.parse(localStorage.getItem('auth_users_directory')) || [];
+            if (usersList.some(user => user.email === email)) {
+                alert("Қате: Бұл логин (Email) тіркеліп қойған!");
+                return;
+            }
+
+            usersList.push({ fullname: fullName, email: email, password: password, role: role, group: group });
+            localStorage.setItem('auth_users_directory', JSON.stringify(usersList));
+
+            alert("Тіркелу сәтті өтті!");
+            document.getElementById('formSignUp').reset();
+            switchAuthView('viewSignIn');
+        }
+
+        function handleUserSignIn(event) {
+            event.preventDefault();
+            const email = document.getElementById('txtSignInEmail').value.trim().toLowerCase();
+            const password = document.getElementById('txtSignInPassword').value;
+
+            const usersList = JSON.parse(localStorage.getItem('auth_users_directory')) || [];
+            const matchedUser = usersList.find(u => u.email === email && u.password === password);
+
+            if (!matchedUser) {
+                alert("Логин немесе пароль қате!");
+                return;
+            }
+
+            currentActiveUserSession = matchedUser;
+            localStorage.setItem('active_login_token', JSON.stringify(currentActiveUserSession));
+            displayAppHeaderStructure();
+            navigateToCorrectView();
+        }
+
+        function executeUserLogout() {
+            localStorage.removeItem('active_login_token');
+            currentActiveUserSession = null;
+            switchAuthView('viewSignIn');
+            document.getElementById('globalHeader').style.display = 'none';
+        }
+
+        /* СТУДЕНТ СТАТУСЫН САКТАУ (Енді аты тұрақты сақталады) */
+        function renderStudentAttendanceState() {
+            const logsDb = JSON.parse(localStorage.getItem('attendance_marks_matrix')) || {};
+            const alertBox = document.getElementById('divStudentStatusAlert');
+            document.getElementById('lblStudentGroupDisplay').innerText = "Тобы: " + currentActiveUserSession.group;
+
+            const markInfo = logsDb[currentActiveUserSession.email];
+
+            if (markInfo) {
+                if (markInfo.isPresent) {
+                    alertBox.className = "status-alert-box status-confirmed";
+                    alertBox.innerText = `✅ Сақталды: Сіз бүгін сабақтасыз! (${markInfo.timestamp})`;
+                } else {
+                    alertBox.className = "status-alert-box status-declined";
+                    alertBox.innerText = `❌ Сақталды: Сіз бүгін сабақта жоқсыз! (${markInfo.timestamp})`;
+                }
+            } else {
+                alertBox.className = "status-alert-box status-unmarked";
+                alertBox.innerText = "⚠️ Сіз бүгін әлі қатысуыңызды растамадыңыз!";
+            }
+        }
+
+        function sendAttendanceMark(isPresentFlag) {
+            const logsDb = JSON.parse(localStorage.getItem('attendance_marks_matrix')) || {};
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                            now.getMinutes().toString().padStart(2, '0') + ':' + 
+                            now.getSeconds().toString().padStart(2, '0');
+
+            logsDb[currentActiveUserSession.email] = {
+                fullname: currentActiveUserSession.fullname,
+                group: currentActiveUserSession.group,
+                isPresent: isPresentFlag,
+                timestamp: timeStr
+            };
+
+            localStorage.setItem('attendance_marks_matrix', JSON.stringify(logsDb));
+            renderStudentAttendanceState();
+            alert("Статус сақталды және куратор журналына жіберілді!");
+        }
+
+        /* КУРАТОР ЖУРНАЛЫ ЖӘНЕ НИК ТАЗАЛАУ (УДАЛИТЬ ЕТУ) */
+        function buildCuratorRecordsTable() {
+            const registeredUsers = JSON.parse(localStorage.getItem('auth_users_directory')) || [];
+            const attendanceLogs = JSON.parse(localStorage.getItem('attendance_marks_matrix')) || {};
+            const tableBody = document.getElementById('tableBodyCuratorRecords');
+
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+
+            let total = 0, present = 0, absent = 0;
+
+            registeredUsers.forEach(user => {
+                if (user.role !== 'student') return; // Кураторды тізімге қоспаймыз
+                total++;
+
+                const markInfo = attendanceLogs[user.email];
+                let statusBadge = '<span class="status-pill pill-none">Белгіленбеген</span>';
+                let timeText = '--:--:--';
+
+                if (markInfo) {
+                    timeText = markInfo.timestamp;
+                    if (markInfo.isPresent) {
+                        statusBadge = '<span class="status-pill pill-present">Сабақта</span>';
+                        present++;
+                    } else {
+                        statusBadge = '<span class="status-pill pill-absent">Сабақта жоқ</span>';
+                        absent++;
+                    }
+                } else {
+                    absent++;
+                }
+
+                const row = `
+                    <tr data-search-tag="${user.fullname.toLowerCase()} ${user.email.toLowerCase()}">
+                        <td><strong>${user.fullname}</strong></td>
+                        <td><code>${user.email}</code></td>
+                        <td><span style="font-weight:600; color:var(--primary);">${user.group}</span></td>
+                        <td>${statusBadge}</td>
+                        <td>${timeText}</td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteStudentAccount('${user.email}')">❌ Аккаунтты өшіру</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('numTotalStudents').innerText = total;
+            document.getElementById('numPresentStudents').innerText = present;
+            document.getElementById('numAbsentStudents').innerText = absent;
+        }
+
+        /* ҚАТЕ ТІРКЕЛГЕН НИКТАРДЫ/АККАУНТТАРДЫ ӨШІРУ ФУНКЦИЯСЫ */
+        function deleteStudentAccount(studentEmail) {
+            if (confirm(`Нақты осы ${studentEmail} аккаунтын (никті) базадан мүлдем өшіргіңіз келе ме?`)) {
+                // 1. Пайдаланушылар тізімінен өшіру
+                let usersList = JSON.parse(localStorage.getItem('auth_users_directory')) || [];
+                usersList = usersList.filter(user => user.email !== studentEmail);
+                localStorage.setItem('auth_users_directory', JSON.stringify(usersList));
+
+                // 2. Оның бүгінгі сабаққа қатысу белгісі бар болса, оны да тазалау
+                let attendanceLogs = JSON.parse(localStorage.getItem('attendance_marks_matrix')) || {};
+                if (attendanceLogs[studentEmail]) {
+                    delete attendanceLogs[studentEmail];
+                    localStorage.setItem('attendance_marks_matrix', JSON.stringify(attendanceLogs));
+                }
+
+                // Күйді қайта жүктеп кестені жаңарту
+                buildCuratorRecordsTable();
+                alert("Қате тіркелген аккаунт жүйеден сәтті өшірілді!");
+            }
+        }
+
+        function triggerTableSearch() {
+            const query = document.getElementById('txtSearchTable').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBodyCuratorRecords tr');
+            rows.forEach(row => {
+                const tag = row.getAttribute('data-search-tag') || '';
+                row.style.display = tag.includes(query) ? '' : 'none';
+            });
+        }
+
+        function wipeOutAttendanceDatabase() {
+            if (confirm("Барлық студенттердің бүгінгі сабаққа қатысу статустарын нөлдегіңіз келе ме? (Аккаунттар өшпейді, тек белгілеулер тазаланады)")) {
+                localStorage.setItem('attendance_marks_matrix', JSON.stringify({}));
+                buildCuratorRecordsTable();
+            }
+        }
+        <script src="server.js"></script>
+         <head>
+        <link rel="manifest" href="manifest.json">
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('PWA Жүйесі дайын!', reg))
+        .catch(err => console.log('PWA Қатесі:', err));
+    });
+  }
+</script>
+</head>
+</body>
+</html>

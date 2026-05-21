@@ -1,0 +1,16 @@
+{
+  "short_name": "SmartAtt",
+  "name": "SmartAttendance Ultimate",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3596/3596093.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#2563eb",
+  "theme_color": "#2563eb",
+  "display": "standalone",
+  "orientation": "portrait"
+}
